@@ -85,21 +85,16 @@ class Input extends Component {
   }
   
   render() {
-    const { disabledText } = this.props;
     const { text, img } = this.state;
 
     return (
       <div className="input">
-        {
-          disabledText && (
-            <input
-              type="text"
-              placeholder="Type something..."
-              onChange={(e) => this.changeForm('text', e.target.value)}
-              value={text}
-            />
-          )
-        }
+        <input
+          type="text"
+          placeholder="Type something..."
+          onChange={(e) => this.changeForm('text', e.target.value)}
+          value={text}
+        />
         {
           img !== null && (<img src={URL.createObjectURL(img)} alt="" width="150" height="150" />)
         }

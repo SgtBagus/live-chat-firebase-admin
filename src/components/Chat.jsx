@@ -70,7 +70,7 @@ class Chat extends Component {
           </div>
         </div>
         <Messages />
-        <Input dataChat={dataChat} currentUser={currentUser} disabledText={messageStatus} />
+        <Input dataChat={dataChat} currentUser={currentUser} />
       </div>
     );
   }

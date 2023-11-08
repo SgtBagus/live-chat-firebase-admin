@@ -1,15 +1,15 @@
 import React, { Component } from "react";
 import { v4 as uuid } from "uuid";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import {
   arrayUnion, doc, serverTimestamp, Timestamp, updateDoc,
 } from "firebase/firestore";
 
+import { db } from "../firebase";
 
-import { db, storage } from "../firebase";
-
-import Img from "../img/img.png";
 import Attach from "../img/attach.png";
+
+import { checkThisFileIsImageOrNot } from "../Helper/checkFile";
+import { uploadFile } from "../data/uploadFile";
 
 class Input extends Component {
   constructor(props) {
@@ -32,27 +32,18 @@ class Input extends Component {
     const { text, img } = this.state;
 
     if (img) {
-      const storageRef = ref(storage, uuid());
-      const uploadTask = uploadBytesResumable(storageRef, img);
+      const pathUpload = checkThisFileIsImageOrNot(img) ? 'message/images/' : 'message/videos/';
 
-      uploadTask.on(
-        (error) => {
-          alert(error);
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-            await updateDoc(doc(db, "chats", dataChat.chatId), {
-              messages: arrayUnion({
-                id: uuid(),
-                text,
-                senderId: currentUser.uid,
-                date: Timestamp.now(),
-                img: downloadURL,
-              }),
-            });
-          });
-        }
-      );
+      const uploadImage = await uploadFile(img, pathUpload);
+      await updateDoc(doc(db, "chats", dataChat.chatId), {
+          messages: arrayUnion({
+              id: uuid(),
+              text,
+              senderId: currentUser.uid,
+              date: Timestamp.now(),
+              img: uploadImage,
+          }),
+      });
     } else {
       await updateDoc(doc(db, "chats", dataChat.chatId), {
         messages: arrayUnion({
@@ -64,16 +55,21 @@ class Input extends Component {
       });
     }
 
+    let lastMessageText = text;
+    if (img && text === '') {
+        lastMessageText = checkThisFileIsImageOrNot(img) ? 'Mengkirimkan Gambar' : 'Mengikirimkan Video';
+    }
+
     await updateDoc(doc(db, "userChats", currentUser.uid), {
       [dataChat.chatId + ".lastMessage"]: {
-        text,
+        text: lastMessageText,
       },
       [dataChat.chatId + ".date"]: serverTimestamp(),
     });
 
     await updateDoc(doc(db, "userChats", dataChat.user.uid), {
       [dataChat.chatId + ".lastMessage"]: {
-        text,
+        text: lastMessageText,
       },
       [dataChat.chatId + ".date"]: serverTimestamp(),
     });
@@ -103,11 +99,11 @@ class Input extends Component {
             type="file"
             style={{ display: "none" }}
             id="file"
+            accept="image/png, image/gif, image/jpeg, video/mp4"
             onChange={(e) => this.changeForm('img', e.target.files[0])}
           />
           <label htmlFor="file">
             <img src={Attach} alt="" />
-            <img src={Img} alt="" />
           </label>
           <button onClick={() => { this.handleSend() }}>Send</button>
         </div>

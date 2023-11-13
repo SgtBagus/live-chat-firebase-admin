@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/live-chat-firebase-admin/static/css/main.82559d9a.css",
+    "main.js": "/live-chat-firebase-admin/static/js/main.3b5208b7.js",
+    "index.html": "/live-chat-firebase-admin/index.html",
+    "main.82559d9a.css.map": "/live-chat-firebase-admin/static/css/main.82559d9a.css.map",
+    "main.3b5208b7.js.map": "/live-chat-firebase-admin/static/js/main.3b5208b7.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.82559d9a.css",
+    "static/js/main.3b5208b7.js"
+  ]
+}
